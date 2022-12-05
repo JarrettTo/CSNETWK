@@ -55,16 +55,40 @@ while(True):
             
             UDPServerSocket.sendto(str.encode("You're already Connected!"), address)
     elif clientMsg["command"]=='register':
-        registeredUsers.append({"handle": clientMsg['handle'], "ip": address})
-        print(registeredUsers)
-        UDPServerSocket.sendto(str.encode("Successfully Registered!"), address)
-    elif clientMsg["command"]=='all':
-        for i in connectedUsers:
-            UDPServerSocket.sendto(str.encode(clientMsg["message"]), i)
-    elif clientMsg["command"]=='message':
+        
+        flag=False
         for i in registeredUsers:
             if i['handle']==clientMsg['handle']:
-                UDPServerSocket.sendto(str.encode(clientMsg["message"]), i['ip'])
+                flag=True
+        if flag:
+            UDPServerSocket.sendto(str.encode("Error: Registration failed. Handle or alias already exists."), address)
+        else:
+            registeredUsers.append({"handle": clientMsg['handle'], "ip": address})
+            UDPServerSocket.sendto(str.encode("Welcome "+clientMsg['handle']+"!"), address)
+        
+    elif clientMsg["command"]=='all':
+        
+        UDPServerSocket.sendto(str.encode("[To All]: " +clientMsg["message"]), address)
+        name='Guest'
+        for i in registeredUsers:
+            if i['ip']==address:
+                name=i['handle']
+        print(name+": "+ clientMsg["message"])
+    elif clientMsg["command"]=='message':
+        flag=False
+        for i in registeredUsers:
+            if i['handle']==clientMsg['handle']:
+                UDPServerSocket.sendto(str.encode("[To "+i['handle']+"]: " +clientMsg["message"]), address)
+                flag=True
+                name='Guest'
+                for j in registeredUsers:
+                    if j['ip']==address:
+                        name=i['handle']
+                print("[From "+name+"]: "+ clientMsg["message"])
+        if flag==False:
+            UDPServerSocket.sendto(str.encode("Error: Handle or alias not found."), address)
+        
+        
     elif clientMsg["command"]=='leave':
         for i in connectedUsers:
             if i == address:
