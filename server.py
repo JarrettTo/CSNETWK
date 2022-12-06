@@ -39,17 +39,17 @@ while(True):
     bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
     message = bytesAddressPair[0]
     address = bytesAddressPair[1]
-    print(message.decode('ASCII'))
+
     try:
         clientMsg = eval(message.decode('ASCII'))
     except:
         print("error")
-    print(clientMsg)
+    
     if clientMsg["command"]=='join':
         if address not in connectedUsers:
-            print("WOW")
+            
             connectedUsers.append(address)
-            print(address)
+
             UDPServerSocket.sendto(str.encode("Connection to the Message Board Server is successful!"), address)
         else:
             
@@ -57,11 +57,16 @@ while(True):
     elif clientMsg["command"]=='register':
         
         flag=False
+        flag2=False
         for i in registeredUsers:
             if i['handle']==clientMsg['handle']:
                 flag=True
+            if i['ip']==address:
+                flag2=True
         if flag:
             UDPServerSocket.sendto(str.encode("Error: Registration failed. Handle or alias already exists."), address)
+        elif flag2:
+            UDPServerSocket.sendto(str.encode("Error: Registration failed. IP already has a Handle or Alias"), address)
         else:
             registeredUsers.append({"handle": clientMsg['handle'], "ip": address})
             UDPServerSocket.sendto(str.encode("Welcome "+clientMsg['handle']+"!"), address)
