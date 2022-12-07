@@ -74,6 +74,7 @@ def broadcast():
                         
                 for client in clients:
                     server.sendto(str.encode(name+": "+clientMsg["message"]), client)
+                print(name+": "+clientMsg["message"])
                 
             elif clientMsg["command"]=='msg':
                 flag1 = True
@@ -93,6 +94,8 @@ def broadcast():
                 else:      
                     server.sendto(str.encode("[To "+to+"]: " +clientMsg["message"]), addr)
                     server.sendto(str.encode("[From "+frm+"]: " +clientMsg["message"]), recepient)
+                print("[To "+to+"]: " +clientMsg["message"])
+                print("[From "+frm+"]: " +clientMsg["message"])
                 
                         
 t1 = threading.Thread(target=receive)
