@@ -31,9 +31,9 @@ def broadcast():
             if clientMsg["command"]=='join':
                 if addr not in clients:
                     clients.append(addr)
-                    server.sendto(f"Connection to the Message Board Server is successful!".encode(), addr)
+                    server.sendto(str.encode("\tConnection to the Message Board Server is successful!"), addr)
                 else:
-                    server.sendto(f"You're already connected!".encode(), addr)
+                    server.sendto(str.encode("\tYou're already connected!"), addr)
                     
             elif clientMsg["command"]=='leave':
                 for client in clients:
@@ -42,7 +42,7 @@ def broadcast():
                 for user in registeredClients:
                     if user[1] == addr:
                         registeredClients.remove(user)
-                server.sendto(str.encode("Connection Closed. Thank You!"), addr)
+                server.sendto(str.encode("\tConnection Closed. Thank You!"), addr)
                 
             elif clientMsg["command"]=='register':
                 if registeredClients:
@@ -54,9 +54,9 @@ def broadcast():
                         elif addr == user[1]:
                             flag2 = True
                     if flag1:
-                        server.sendto(str.encode("Error: Handle or alias already exists"), addr)
+                        server.sendto(str.encode("\tError: Handle or alias already exists"), addr)
                     elif flag2:
-                        server.sendto(str.encode("Error: Registration failed. IP already has a Handle or Alias."), addr)
+                        server.sendto(str.encode("\tError: Registration failed. IP already has a Handle or Alias."), addr)
                     else:
                         registeredClients.append([clientMsg["handle"], addr])
                         server.sendto(str.encode("Welcome "+clientMsg['handle']+"!"), addr)
@@ -67,35 +67,45 @@ def broadcast():
                     
                     
             elif clientMsg["command"]=='all':
-                name="Guest"
+                flag1 = True
+                name=""
                 for user in registeredClients:
                     if user[1] == addr:
                         name=user[0]
-                        
-                for client in clients:
-                    server.sendto(str.encode(name+": "+clientMsg["message"]), client)
-                print(name+": "+clientMsg["message"])
+                        flag1 = False
+                if not flag1:
+                    for client in registeredClients:
+                        server.sendto(str.encode(name+": "+clientMsg["message"]), client[1])
+                    print(name+": "+clientMsg["message"])
+                else:
+                    print("Error: You are not registered.")
                 
             elif clientMsg["command"]=='msg':
                 flag1 = True
-                frm = "Guest"
-                to = ""
+                flag2 = True
+                sndr = ""
+                rcvr = ""
                 recepient = ""
+                print(clientMsg['handle'])
                 for sender in registeredClients:
+                    
                     if sender[1] == addr:
-                        frm = user[0]
+                        sndr = sender[0]
+                        flag1 = False
                 for receiver in registeredClients:
                     if receiver[0] == clientMsg['handle']:
-                        to = receiver[0]
+                        rcvr = receiver[0]
                         recepient = receiver[1]
-                        flag1 = False
+                        flag2 = False
                 if flag1:
-                    server.sendto(str.encode("Error: Handle or alias not found."), addr)
+                    server.sendto(str.encode("\tError: You are not registered."), addr)
+                if flag2:
+                    server.sendto(str.encode("\tError: Handle or alias not found."), addr)
                 else:      
-                    server.sendto(str.encode("[To "+to+"]: " +clientMsg["message"]), addr)
-                    server.sendto(str.encode("[From "+frm+"]: " +clientMsg["message"]), recepient)
-                print("[To "+to+"]: " +clientMsg["message"])
-                print("[From "+frm+"]: " +clientMsg["message"])
+                    server.sendto(str.encode("[To "+rcvr+"]: " +clientMsg["message"]), addr)
+                    server.sendto(str.encode("[From "+sndr+"]: " +clientMsg["message"]), recepient)
+                print("[To "+rcvr+"]: " +clientMsg["message"])
+                print("[From "+sndr+"]: " +clientMsg["message"])
                 
                         
 t1 = threading.Thread(target=receive)
