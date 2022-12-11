@@ -26,8 +26,6 @@ def broadcast():
         while not messages.empty():
             message, addr = messages.get()
             clientMsg = eval(message.decode('ASCII'))
-            print(clientMsg)
-            print(addr)
 
             if clientMsg["command"] == 'join':
                 if addr not in clients:
