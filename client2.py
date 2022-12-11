@@ -8,7 +8,7 @@ client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 joined = False
 leave = False
 registered = False
-serverAddress = ("127.0.0.2", 21000)
+serverAddress = ("127.0.0.1", 12345)
 
 
 def receive():
@@ -30,10 +30,11 @@ while not leave:
 
     if command == "/join":
         try:
+            
             ip = message.split(" ")[1]
             port = int(message.split(" ")[2])
             try:
-                if (ip == "127.0.0.2" and port == 21000):
+                if (ip == "127.0.0.1" and port == 12345):
                     client.sendto(str.encode("{'command':'join'}"), serverAddress)
                     joined = True
                 else:
