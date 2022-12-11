@@ -8,7 +8,6 @@ client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 joined = False
 leave = False
 registered = False
-serverAddress = ("127.0.0.1", 12345)
 
 
 def receive():
@@ -44,7 +43,7 @@ while not leave:
 
     elif command == "/leave" and joined:
         if len(message.split(" ")) == 1:
-            client.sendto(str.encode("{'command':'leave'}"), serverAddress)
+            client.sendto(str.encode("{'command':'leave'}"), (ip, port))
             client.close
             registered = False
             joined = False
@@ -55,7 +54,7 @@ while not leave:
         if len(message.split(" ")) == 2:
             try:
                 client.sendto(str.encode('{"command":"register", "handle":"' + message.split(" ")[1] + '"}'),
-                              serverAddress)
+                              (ip, port))
                 registered = True
             except:
                 print("\tError: Failed to register")
@@ -68,7 +67,7 @@ while not leave:
                 msg = str(' '.join(message.split(" ")[1:]))
                 new_msg = msg.replace('"', r'\"')
                 client.sendto(str.encode('{"command":"all", "message":"' + new_msg + '"}'),
-                              serverAddress)
+                              (ip, port))
             else:
                 print("\tError: Command parameters do not match or is not allowed.")
         else:
@@ -81,7 +80,7 @@ while not leave:
                 new_msg = msg.replace('"', r'\"')
                 client.sendto(str.encode(
                     '{"command":"msg", "handle":"' + message.split(" ")[1] + '","message":"' + new_msg + '"}'),
-                    serverAddress)
+                    (ip, port))
             else:
                 print("\tError: Command parameters do not match or is not allowed.")
         else:
