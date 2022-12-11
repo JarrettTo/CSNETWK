@@ -34,15 +34,11 @@ while not leave:
             ip = message.split(" ")[1]
             port = int(message.split(" ")[2])
             try:
-                if (ip == "127.0.0.1" and port == 12345):
-                    client.sendto(str.encode("{'command':'join'}"), serverAddress)
-                    joined = True
-                else:
-                    print(
-                        "\tError: Connection to the Message Board Server has failed! Please check IP Address and Port Number.")
+                client.sendto(str.encode("{'command':'join'}"), (ip, port))
+                joined=True
             except:
-                print(
-                    "\tError: Connection to the Message Board Server has failed! Please check IP Address and Port Number.")
+                print("\tError: Connection to the Message Board Server has failed! Please check IP Address and Port Number.")
+                joined=False
         except:
             print("\tError: Command parameters do not match or is not allowed.")
 
