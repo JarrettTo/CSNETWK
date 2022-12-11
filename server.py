@@ -7,7 +7,7 @@ clients = []
 registeredClients = []
 
 server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server.bind(("127.0.0.2", 21000))
+server.bind(("127.0.0.1", 12345))
 
 print("UDP server up and listening")
 
@@ -25,8 +25,7 @@ def broadcast():
         while not messages.empty():
             message, addr = messages.get()
             clientMsg = eval(message.decode('ASCII'))
-            print(clientMsg)
-            print(addr)
+
             
             if clientMsg["command"]=='join':
                 if addr not in clients:
@@ -86,7 +85,7 @@ def broadcast():
                 sndr = ""
                 rcvr = ""
                 recepient = ""
-                print(clientMsg['handle'])
+
                 for sender in registeredClients:
                     
                     if sender[1] == addr:

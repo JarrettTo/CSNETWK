@@ -4,7 +4,7 @@ import random
 import queue
 
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
+client.settimeout(2)
 joined=False
 leave=False
 registered=False
@@ -26,25 +26,24 @@ t.start()
 while not leave:
     message = input("")
     command = message.split(" ")[0]
-    
     if command == "/join":
         try:
             ip = message.split(" ")[1]
             port = int(message.split(" ")[2])
             try:
-                if (ip == "127.0.0.2" and port == 21000):
-                    client.sendto(str.encode("{'command':'join'}"), serverAddress)
-                    joined = True
-                else:
-                    print("\tError: Connection to the Message Board Server has failed! Please check IP Address and Port Number.")
+                client.sendto(str.encode("{'command':'join'}"), (ip, port))
+                joined=True
             except:
                 print("\tError: Connection to the Message Board Server has failed! Please check IP Address and Port Number.")
+                joined=False
         except:
             print("\tError: Command parameters do not match or is not allowed.")
             
     elif command == "/leave" and joined:
         if len(message.split(" ")) == 1:
-            client.sendto(str.encode("{'command':'leave'}"), serverAddress)    
+            print(ip)
+            print(port)
+            client.sendto(str.encode("{'command':'leave'}"),(ip, port))    
             client.close
             registered=False
             joined = False
@@ -54,7 +53,7 @@ while not leave:
     elif command == "/register" and joined:
         if len(message.split(" ")) ==2:
             try:
-                client.sendto(str.encode('{"command":"register", "handle":"'+message.split(" ")[1]+'"}'), serverAddress)
+                client.sendto(str.encode('{"command":"register", "handle":"'+message.split(" ")[1]+'"}'), (ip, port))
                 registered = True
             except:
                 print("\tError: Failed to register")
@@ -64,7 +63,7 @@ while not leave:
     elif command == "/all" and joined:
         if registered:
             if len(message.split(" ")) >=2: 
-                client.sendto(str.encode('{"command":"all", "message":"'+" ".join(message.split(" ")[1:])+'"}'), serverAddress)
+                client.sendto(str.encode('{"command":"all", "message":"'+" ".join(message.split(" ")[1:])+'"}'), (ip, port))
             else:
                 print("\tError: Command parameters do not match or is not allowed.")
         else:
@@ -73,7 +72,7 @@ while not leave:
     elif command == "/msg" and joined:
         if registered:
             if len(message.split(" ")) >=3: 
-                client.sendto(str.encode('{"command":"msg", "handle":"'+message.split(" ")[1]+ '","message":"'+" ".join(message.split(" ")[2:])+'"}'), serverAddress)
+                client.sendto(str.encode('{"command":"msg", "handle":"'+message.split(" ")[1]+ '","message":"'+" ".join(message.split(" ")[2:])+'"}'), (ip, port))
             else:
                 print("\tError: Command parameters do not match or is not allowed.")
         else:
